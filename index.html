@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ñøvã Vault</title>
+<meta name="theme-color" content="#14110F">
+<meta name="description" content="Free course PDFs for FUTA students — Students Resources Made Easy.">
+<meta property="og:title" content="Ñøvã Vault">
+<meta property="og:description" content="Free course PDFs for FUTA students — Students Resources Made Easy.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14110F; --panel:#211C18; --panel-2:#2A231D;
+  --purple:#5B0F8E; --purple-deep:#3A0A5C;
+  --gold:#C9A84C; --gold-bright:#E4C878;
+  --cream:#EDE6D8; --mute:#9C8FAE; --danger:#B45252;
+  --line:rgba(201,168,76,0.22);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--ink); color:var(--cream); font-family:'Sora',system-ui,sans-serif; min-height:100vh; padding-bottom:40px;}
+h1,h3{font-family:'Fraunces',Georgia,serif; font-weight:700;}
+button{font-family:inherit; border:none; background:none; color:inherit; cursor:pointer;}
+.wrap{max-width:520px; margin:0 auto; padding:0 18px;}
+
+header{position:sticky; top:0; z-index:10; background:rgba(20,17,15,0.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+.hbar{display:flex; align-items:center; gap:12px; padding:16px 18px;}
+.dial{width:34px; height:34px; border-radius:50%; flex-shrink:0; position:relative; background:conic-gradient(var(--gold) 0deg 20deg, transparent 20deg 90deg, var(--gold) 90deg 110deg, transparent 110deg 180deg, var(--gold) 180deg 200deg, transparent 200deg 270deg, var(--gold) 270deg 290deg, transparent 290deg 360deg); animation:spin 14s linear infinite; -webkit-tap-highlight-color:transparent;}
+.dial::after{content:""; position:absolute; inset:9px; border-radius:50%; background:var(--ink); border:1px solid var(--purple);}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.dial{animation:none}}
+.hbar h1{font-size:1.3rem; letter-spacing:-0.01em; flex:1;}
+.add-btn{display:none; width:38px; height:38px; border-radius:8px; background:var(--gold); color:var(--purple-deep); font-size:1.3rem; font-weight:700; align-items:center; justify-content:center;}
+body.is-owner .add-btn{display:flex;}
+.tagline{font-size:.78rem; color:var(--mute); padding:0 18px 14px;}
+
+main{padding-top:18px;}
+.empty{text-align:center; padding:60px 20px; color:var(--mute);}
+.empty h3{color:var(--cream); margin-bottom:8px;}
+.folder{border:1px solid var(--line); border-radius:10px; margin-bottom:12px; overflow:hidden; background:var(--panel);}
+.folder-head{display:flex; align-items:center; gap:10px; padding:15px 14px; cursor:pointer;}
+.chevron{width:9px; height:9px; border-right:2px solid var(--gold); border-bottom:2px solid var(--gold); transform:rotate(-45deg); transition:transform .3s ease; flex-shrink:0;}
+.folder.open .chevron{transform:rotate(45deg);}
+.folder-name{font-weight:600; flex:1;}
+.folder-count{font-size:.78rem; color:var(--mute); background:var(--panel-2); padding:2px 8px; border-radius:20px;}
+.owner-actions{display:none; gap:4px; margin-left:4px;}
+body.is-owner .owner-actions{display:flex;}
+.icon-btn{width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:var(--mute);}
+.icon-btn:active{background:var(--panel-2);}
+.icon-btn.danger:active{color:var(--danger);}
+.folder-body{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+.folder-body-inner{padding:0 14px 14px;}
+.file-row{display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--line); opacity:0; transform:translateY(-6px); animation:rowIn .35s ease forwards;}
+.file-row:first-child{border-top:none;}
+@keyframes rowIn{to{opacity:1; transform:translateY(0)}}
+.file-title{flex:1; font-size:.92rem;}
+.dl{color:var(--gold-bright);}
+.file-empty{padding:14px 0; color:var(--mute); font-size:.85rem;}
+
+.admin-bar{display:none; gap:10px; margin-top:20px; align-items:center;}
+body.is-owner .admin-bar{display:flex;}
+.admin-bar .status{flex:1; font-size:.78rem; color:var(--mute);}
+
+.overlay{position:fixed; inset:0; background:rgba(10,8,7,0.7); backdrop-filter:blur(3px); display:none; align-items:flex-end; justify-content:center; z-index:50; opacity:0; transition:opacity .25s ease;}
+.overlay.open{display:flex; opacity:1;}
+.sheet{width:100%; max-width:480px; background:var(--panel); border:1px solid var(--line); border-top-left-radius:16px; border-top-right-radius:16px; padding:22px 20px calc(26px + env(safe-area-inset-bottom,0px)); transform:translateY(16px); transition:transform .3s ease;}
+.overlay.open .sheet{transform:translateY(0);}
+.sheet h3{font-size:1.15rem; margin-bottom:6px;}
+.sheet p{color:var(--mute); font-size:.88rem; margin-bottom:16px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:.78rem; color:var(--mute); margin-bottom:6px;}
+.field input{width:100%; background:var(--ink); border:1px solid var(--line); border-radius:8px; padding:12px; color:var(--cream); font-size:.95rem; font-family:inherit;}
+.field input:focus{outline:none; border-color:var(--gold);}
+.field input[type=file]{padding:9px; font-size:.85rem; color:var(--mute);}
+.field input[type=file]::file-selector-button{background:var(--gold); color:var(--purple-deep); border:none; border-radius:6px; padding:8px 12px; font-weight:600; margin-right:10px; cursor:pointer; font-family:inherit;}
+.sheet-actions{display:flex; gap:10px; margin-top:6px;}
+.btn{flex:1; padding:13px; border-radius:8px; font-weight:600; font-size:.92rem; text-align:center;}
+.btn-gold{background:var(--gold); color:var(--purple-deep);}
+.btn-ghost{border:1px solid var(--line); color:var(--cream);}
+.btn-danger{background:var(--danger); color:#fff;}
+
+.lock{width:52px; height:60px; margin:0 auto 16px; position:relative;}
+.lock .shackle{position:absolute; top:0; left:9px; width:34px; height:28px; border:5px solid var(--gold); border-bottom:none; border-radius:17px 17px 0 0;}
+.lock .body{position:absolute; bottom:0; left:0; width:52px; height:34px; background:var(--gold); border-radius:5px;}
+
+.toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:var(--panel-2); border:1px solid var(--line); color:var(--cream); padding:11px 18px; border-radius:30px; font-size:.85rem; opacity:0; transition:all .3s ease; z-index:60; pointer-events:none; max-width:86vw; text-align:center;}
+.toast.show{opacity:1; transform:translate(-50%,0);}
+
+footer{text-align:center; padding:40px 0 10px; color:var(--mute); font-size:.78rem;}
+footer a{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar wrap">
+    <div class="dial" id="dial" aria-hidden="true"></div>
+    <h1>Ñøvã Vault</h1>
+    <button class="add-btn" id="btnAddFolder" aria-label="Add folder">+</button>
+  </div>
+  <div class="tagline wrap">Students Resources Made Easy</div>
+</header>
+
+<main class="wrap">
+  <div id="folderList"></div>
+  <div class="empty" id="emptyState" style="display:none"><h3>The vault is empty</h3><p>Check back soon.</p></div>
+  <div class="admin-bar">
+    <span class="status">Admin mode — changes save automatically</span>
+    <button class="btn btn-ghost" id="btnExitAdmin" style="flex:none; padding:10px 16px;">Exit</button>
+  </div>
+</main>
+
+<footer>Made by Ñøvã Kïñg · <a id="channelLink" href="#" target="_blank" rel="noopener">Join the channel</a></footer>
+
+<div class="overlay" id="tokenOverlay">
+  <div class="sheet">
+    <h3>Admin access</h3>
+    <p>Paste a GitHub token scoped only to this one repo, with Contents: Read and write — it needs this to store your actual PDF files too. Saved only on this device, never sent anywhere except directly to GitHub.</p>
+    <div class="field"><label>GitHub token</label><input id="inputToken" type="password" autocomplete="off" placeholder="github_pat_..."></div>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" id="tokenCancel">Cancel</button>
+      <button class="btn btn-gold" id="tokenSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="formOverlay">
+  <div class="sheet">
+    <h3 id="formTitle">Add folder</h3>
+    <div class="field" id="fieldName"><label>Folder name</label><input id="inputName" placeholder="e.g. 100 Level"></div>
+    <div class="field" id="fieldTitle" style="display:none"><label>PDF title</label><input id="inputTitle" placeholder="e.g. MTS 101 Revision"></div>
+    <div class="field" id="fieldUrl" style="display:none"><label>PDF file</label><input id="inputFile" type="file" accept="application/pdf"></div>
+    <p id="uploadStatus" style="display:none;color:var(--mute);font-size:.82rem;margin-top:-6px;margin-bottom:10px;"></p>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" id="formCancel">Cancel</button>
+      <button class="btn btn-gold" id="formSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="confirmOverlay">
+  <div class="sheet">
+    <h3 id="confirmTitle">Delete this?</h3>
+    <p id="confirmSub"></p>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="gateOverlay">
+  <div class="sheet" style="text-align:center">
+    <div class="lock"><div class="shackle"></div><div class="body"></div></div>
+    <h3>Unlock the vault</h3>
+    <p>Join the channel once to download — new PDFs and deadline alerts land there first. This only shows once.</p>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" id="gateCancel">Not now</button>
+      <button class="btn btn-gold" id="gateJoin">Join &amp; unlock</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== FILL THESE IN ONCE ===================== */
+var OWNER = "your-github-username";
+var REPO = "your-repo-name";
+var BRANCH = "main";
+var CHANNEL_URL = "#"; // your WhatsApp channel link
+/* ================================================================= */
+var DATA_PATH = "data.json";
+var SEED = { folders: [] }; // used only if data.json can't be fetched yet
+
+(function(){
+"use strict";
+var DATA = {folders:[]};
+var canWrite = false;
+
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function toast(msg){
+  var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ---------- render ---------- */
+function render(){
+  var list = document.getElementById('folderList');
+  var empty = document.getElementById('emptyState');
+  if (!DATA.folders.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = DATA.folders.map(function(fo,fi){
+    var files = fo.files || [];
+    var rows = files.length ? files.map(function(fl,i){
+      return '<div class="file-row" style="animation-delay:'+(i*0.05)+'s">'
+        + '<span class="file-title">'+esc(fl.title)+'</span>'
+        + '<button class="icon-btn dl" data-action="download" data-url="'+esc(fl.url)+'" aria-label="Download">\u2913</button>'
+        + '<button class="icon-btn danger" data-action="delete-file" data-fi="'+fi+'" data-ti="'+i+'" data-title="'+esc(fl.title)+'" aria-label="Delete">\u2715</button>'
+        + '</div>';
+    }).join('') : '<div class="file-empty">No PDFs here yet.</div>';
+    return '<div class="folder" data-fi="'+fi+'">'
+      + '<div class="folder-head" data-action="toggle">'
+        + '<span class="chevron"></span>'
+        + '<span class="folder-name">'+esc(fo.name)+'</span>'
+        + '<span class="folder-count">'+files.length+'</span>'
+        + '<span class="owner-actions">'
+          + '<button class="icon-btn" data-action="add-file" data-fi="'+fi+'" aria-label="Add PDF">+</button>'
+          + '<button class="icon-btn danger" data-action="delete-folder" data-fi="'+fi+'" data-name="'+esc(fo.name)+'" aria-label="Delete folder">\u2715</button>'
+        + '</span>'
+      + '</div>'
+      + '<div class="folder-body"><div class="folder-body-inner">'+rows+'</div></div>'
+    + '</div>';
+  }).join('');
+}
+
+/* ---------- load data ---------- */
+fetch(DATA_PATH, {cache:'no-store'})
+  .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+  .then(function(j){ DATA = j; render(); })
+  .catch(function(){ DATA = SEED; render(); });
+
+/* ---------- token / github publish ---------- */
+function getToken(){ try{ return localStorage.getItem('nova_vault_gh_token'); }catch(e){ return null; } }
+function setToken(t){ try{ localStorage.setItem('nova_vault_gh_token', t); }catch(e){} }
+function b64u(str){ return btoa(unescape(encodeURIComponent(str))); }
+
+function saveData(){
+  var token = getToken();
+  var api = 'https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+DATA_PATH;
+  var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' };
+  return fetch(api+'?ref='+BRANCH, {headers:headers})
+    .then(function(r){ return r.status===404 ? null : r.json(); })
+    .then(function(cur){
+      var body = { message:'Update vault data', content:b64u(JSON.stringify(DATA,null,2)), branch:BRANCH };
+      if (cur && cur.sha) body.sha = cur.sha;
+      return fetch(api, { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},headers), body:JSON.stringify(body) });
+    })
+    .then(function(r){ if(!r.ok) throw 0; });
+}
+
+var channelLinkEl = document.getElementById('channelLink');
+if (channelLinkEl) channelLinkEl.href = CHANNEL_URL;
+
+/* ---------- secret admin trigger ---------- */
+var tapCount=0, tapTimer=null;
+document.getElementById('dial').addEventListener('click', function(){
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(function(){ tapCount=0; }, 2500);
+  if (tapCount>=5){
+    tapCount=0;
+    if (!getToken()){ document.getElementById('tokenOverlay').classList.add('open'); }
+    else { canWrite = !canWrite; document.body.classList.toggle('is-owner', canWrite); }
+  }
+});
+document.getElementById('tokenCancel').addEventListener('click', function(){ document.getElementById('tokenOverlay').classList.remove('open'); });
+document.getElementById('tokenSave').addEventListener('click', function(){
+  var v = document.getElementById('inputToken').value.trim();
+  if(!v) return;
+  setToken(v);
+  document.getElementById('tokenOverlay').classList.remove('open');
+  canWrite = true;
+  document.body.classList.add('is-owner');
+  toast('Admin mode on');
+});
+document.getElementById('btnExitAdmin').addEventListener('click', function(){ canWrite=false; document.body.classList.remove('is-owner'); });
+
+/* ---------- gate ---------- */
+function hasUnlocked(){ try{ return localStorage.getItem('nova_vault_unlocked')==='1'; }catch(e){ return true; } }
+function setUnlocked(){ try{ localStorage.setItem('nova_vault_unlocked','1'); }catch(e){} }
+var pendingUrl = null;
+function openGate(url){ pendingUrl=url; document.getElementById('gateOverlay').classList.add('open'); }
+document.getElementById('gateJoin').addEventListener('click', function(){
+  setUnlocked(); window.open(CHANNEL_URL,'_blank');
+  var u = pendingUrl; setTimeout(function(){ if(u) window.open(u,'_blank'); }, 350);
+  document.getElementById('gateOverlay').classList.remove('open');
+});
+document.getElementById('gateCancel').addEventListener('click', function(){ document.getElementById('gateOverlay').classList.remove('open'); });
+
+/* ---------- add / delete forms ---------- */
+var formMode=null, formFi=null;
+function openForm(mode, fi){
+  formMode=mode; formFi=fi;
+  var isFolder = mode==='folder';
+  document.getElementById('formTitle').textContent = isFolder ? 'Add folder' : 'Add PDF';
+  document.getElementById('fieldName').style.display = isFolder?'block':'none';
+  document.getElementById('fieldTitle').style.display = isFolder?'none':'block';
+  document.getElementById('fieldUrl').style.display = isFolder?'none':'block';
+  document.getElementById('inputName').value=''; document.getElementById('inputTitle').value='';
+  document.getElementById('inputFile').value=''; document.getElementById('uploadStatus').style.display='none';
+  document.getElementById('formOverlay').classList.add('open');
+}
+document.getElementById('formCancel').addEventListener('click', function(){ document.getElementById('formOverlay').classList.remove('open'); });
+
+function arrayBufferToBase64(buf){
+  var bytes = new Uint8Array(buf), chunk = 0x8000, parts = [];
+  for (var i=0; i<bytes.length; i+=chunk){
+    parts.push(String.fromCharCode.apply(null, bytes.subarray(i, i+chunk)));
+  }
+  return btoa(parts.join(''));
+}
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'file'; }
+
+function uploadPdfToGithub(file, path){
+  var token = getToken();
+  var api = 'https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path;
+  var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' };
+  return file.arrayBuffer().then(function(buf){
+    return fetch(api, { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},headers),
+      body: JSON.stringify({ message:'Add PDF '+path, content:arrayBufferToBase64(buf), branch:BRANCH }) });
+  }).then(function(r){ if(!r.ok) throw 0; });
+}
+function deletePdfFromGithub(path){
+  var token = getToken();
+  var api = 'https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path;
+  var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' };
+  return fetch(api+'?ref='+BRANCH, {headers:headers}).then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(cur){
+      if(!cur) return;
+      return fetch(api, { method:'DELETE', headers:Object.assign({'Content-Type':'application/json'},headers),
+        body: JSON.stringify({ message:'Remove PDF '+path, sha:cur.sha, branch:BRANCH }) });
+    });
+}
+
+document.getElementById('formSave').addEventListener('click', function(){
+  if (formMode==='folder'){
+    var name = document.getElementById('inputName').value.trim();
+    if(!name) return;
+    DATA.folders.push({name:name, files:[]});
+    render();
+    document.getElementById('formOverlay').classList.remove('open');
+    saveData().then(function(){ toast('Folder added'); }).catch(function(){ toast('Could not save — check connection'); });
+    return;
+  }
+  var title = document.getElementById('inputTitle').value.trim();
+  var file = document.getElementById('inputFile').files[0];
+  if(!title||!file) return;
+  if (file.size > 24*1024*1024){ toast('Keep PDFs under ~24MB'); return; }
+  var status = document.getElementById('uploadStatus');
+  status.style.display='block'; status.textContent='Uploading PDF…';
+  var path = 'pdfs/'+Date.now()+'-'+slugify(title)+'.pdf';
+  uploadPdfToGithub(file, path).then(function(){
+    DATA.folders[formFi].files.push({title:title, url:path});
+    render();
+    document.getElementById('formOverlay').classList.remove('open');
+    return saveData();
+  }).then(function(){ toast('PDF uploaded and live'); })
+  .catch(function(){ status.textContent=''; toast('Upload failed — check token and try again'); });
+});
+document.getElementById('btnAddFolder').addEventListener('click', function(){ openForm('folder'); });
+
+var confirmAction=null;
+function openConfirm(title, sub, action){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmSub').textContent=sub;
+  confirmAction=action;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+document.getElementById('confirmCancel').addEventListener('click', function(){ document.getElementById('confirmOverlay').classList.remove('open'); });
+document.getElementById('confirmOk').addEventListener('click', function(){ if(confirmAction) confirmAction(); document.getElementById('confirmOverlay').classList.remove('open'); });
+
+document.getElementById('folderList').addEventListener('click', function(e){
+  var el = e.target.closest('[data-action]'); if(!el) return;
+  var a = el.dataset.action;
+  if (a==='toggle'){
+    var folder = el.closest('.folder'); var body = folder.querySelector('.folder-body');
+    var open = folder.classList.toggle('open');
+    body.style.maxHeight = open ? (body.scrollHeight+'px') : '0px';
+    return;
+  }
+  if (a==='download'){ e.stopPropagation(); hasUnlocked() ? window.open(el.dataset.url,'_blank') : openGate(el.dataset.url); return; }
+  if (a==='add-file'){ e.stopPropagation(); openForm('pdf', +el.dataset.fi); return; }
+  if (a==='delete-file'){ e.stopPropagation();
+    var fi=+el.dataset.fi, ti=+el.dataset.ti;
+    openConfirm('Delete this PDF?', '"'+el.dataset.title+'" will be removed.', function(){
+      var path = DATA.folders[fi].files[ti].url;
+      DATA.folders[fi].files.splice(ti,1); render();
+      deletePdfFromGithub(path).then(saveData).then(function(){ toast('Deleted'); })
+        .catch(function(){ toast('Removed from list, but file delete failed'); });
+    }); return;
+  }
+  if (a==='delete-folder'){ e.stopPropagation();
+    var fi2=+el.dataset.fi;
+    openConfirm('Delete this folder?', '"'+el.dataset.name+'" and every PDF inside it will be removed.', function(){
+      var paths = (DATA.folders[fi2].files||[]).map(function(f){ return f.url; });
+      DATA.folders.splice(fi2,1); render();
+      Promise.all(paths.map(deletePdfFromGithub)).then(saveData).then(function(){ toast('Folder deleted'); })
+        .catch(function(){ toast('Removed from list, but some files may remain in GitHub'); });
+    }); return;
+  }
+});
+})();
+</script>
+</body>
+</html>
